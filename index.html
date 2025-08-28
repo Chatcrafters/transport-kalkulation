@@ -42,7 +42,7 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .transport-info input, .transport-info textarea {
+        .transport-info input, .transport-info textarea, .transport-info select {
             width: 100%;
             padding: 8px;
             font-size: 14px;
@@ -305,7 +305,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚛 Transportkostenkalkulation & Angebotserstellung</h1>
+        <h1>Transportkostenkalkulation & Angebotserstellung</h1>
         
         <div class="main-content">
             <!-- Kalkulationsbereich -->
@@ -362,7 +362,7 @@
 
                 <!-- Vorlaufkosten -->
                 <div class="cost-section">
-                    <div class="section-header">📦 Vorlaufkosten</div>
+                    <div class="section-header">Vorlaufkosten</div>
                     
                     <div class="cost-item">
                         <label>Vorlauf</label>
@@ -402,13 +402,13 @@
                     
                     <div class="cost-item subtotal">
                         <label>Zwischensumme Vorlaufkosten</label>
-                        <span id="subtotal-vorlauf">0,00 EUR</span>
+                        <span id="subtotal-vorlauf">0,00 USD</span>
                     </div>
                 </div>
 
                 <!-- Nachlaufkosten -->
                 <div class="cost-section">
-                    <div class="section-header">🏭 Nachlaufkosten</div>
+                    <div class="section-header">Nachlaufkosten</div>
                     
                     <div class="cost-item">
                         <label>Verzollung</label>
@@ -461,30 +461,51 @@
                     </div>
                 </div>
 
-                <!-- Endsumme -->
+                <!-- Einkaufs-/Verkaufspreis -->
                 <div class="cost-section">
                     <div class="cost-item total">
-                        <label>🎯 ENDSUMME (USD)</label>
-                        <span id="total-final">0,00 USD</span>
-                    </div>
-                    <div class="cost-item total" style="background-color: #17a2b8;">
-                        <label>🎯 ENDSUMME (EUR)</label>
+                        <label>Einkaufspreis (EUR)</label>
                         <span id="total-final-eur">0,00 EUR</span>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Gewinnmarge (%)</label>
+                        <input type="number" step="0.1" id="profit-margin" value="15" oninput="calculateTotals()" placeholder="15">
+                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">%</span>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Zusätzliche Kosten</label>
+                        <input type="number" step="0.01" id="additional-costs" oninput="calculateTotals()" placeholder="0">
+                        <select class="currency-select" onchange="calculateTotals()">
+                            <option>EUR</option>
+                            <option>USD</option>
+                        </select>
+                    </div>
+                    
+                    <div class="cost-item total" style="background-color: #28a745;">
+                        <label>Verkaufspreis (EUR)</label>
+                        <span id="selling-price">0,00 EUR</span>
+                    </div>
+                    
+                    <div class="cost-item subtotal">
+                        <label>Gewinn (EUR)</label>
+                        <span id="profit-amount">0,00 EUR</span>
                     </div>
                 </div>
 
                 <div class="buttons">
-                    <button class="save-button" onclick="saveTransport()">💾 Transport speichern</button>
-                    <button class="offer-button" onclick="generateOffer()">📄 Angebot erstellen</button>
-                    <button onclick="resetForm()">🔄 Zurücksetzen</button>
-                    <button onclick="exportAllToCSV()">📊 Alle als CSV</button>
+                    <button class="save-button" onclick="saveTransport()">Transport speichern</button>
+                    <button class="offer-button" onclick="generateOffer()">Angebot erstellen</button>
+                    <button onclick="resetForm()">Zurücksetzen</button>
+                    <button onclick="exportAllToCSV()">Alle als CSV</button>
                 </div>
             </div>
 
             <!-- Übersichtsbereich -->
             <div class="overview-section">
                 <div class="overview-header">
-                    <h2>📊 Gespeicherte Transporte</h2>
+                    <h2>Gespeicherte Transporte</h2>
                 </div>
                 
                 <div class="transport-list" id="transport-list">
@@ -494,14 +515,14 @@
                 </div>
 
                 <div class="grand-total" id="grand-total" style="display: none;">
-                    🏆 GESAMTKOSTEN ALLER TRANSPORTE<br>
+                    GESAMTKOSTEN ALLER TRANSPORTE<br>
                     <span id="grand-total-amount">0,00 USD</span><br>
                     <small id="grand-total-eur">(0,00 EUR)</small>
                 </div>
 
                 <div class="buttons" style="margin-top: 20px;">
-                    <button onclick="generateGroupedOffer()" class="offer-button">📋 Gruppiertes Angebot (nur Text)</button>
-                    <button onclick="clearAllTransports()" style="background-color: #dc3545;">🗑️ Alle löschen</button>
+                    <button onclick="generateGroupedOffer()" class="offer-button">Gruppiertes Angebot (nur Text)</button>
+                    <button onclick="clearAllTransports()" style="background-color: #dc3545;">Alle löschen</button>
                 </div>
             </div>
         </div>
@@ -525,9 +546,9 @@
             </div>
             
             <div class="buttons">
-                <button onclick="updateOfferPreview()" style="background-color: #17a2b8;">🔄 Vorschau aktualisieren</button>
-                <button onclick="copyToClipboard()" style="background-color: #28a745;">📋 Für Outlook kopieren</button>
-                <button onclick="printOffer()" style="background-color: #6c757d;">🖨️ Drucken</button>
+                <button onclick="updateOfferPreview()" style="background-color: #17a2b8;">Vorschau aktualisieren</button>
+                <button onclick="copyToClipboard()" style="background-color: #28a745;">Für Outlook kopieren</button>
+                <button onclick="printOffer()" style="background-color: #6c757d;">Drucken</button>
             </div>
             
             <div class="offer-preview" id="offer-preview">
@@ -580,17 +601,13 @@
                 }
             });
 
-            // Anzeige aktualisieren
-            document.getElementById('subtotal-vorlauf').textContent = subtotalVorlaufUSD.toFixed(2) + ' USD';
-            document.getElementById('subtotal-nachlauf').textContent = subtotalNachlaufUSD.toFixed(2) + ' USD';
-            
             const totalUSD = subtotalVorlaufUSD + subtotalNachlaufUSD;
             const totalEUR = totalUSD / exchangeRate;
             
             // Verkaufspreis berechnen
             const profitMargin = parseFloat(document.getElementById('profit-margin').value) || 0;
             const additionalCosts = parseFloat(document.getElementById('additional-costs').value) || 0;
-            const additionalCostsCurrency = document.querySelectorAll('.currency-select')[9].value;
+            const additionalCostsCurrency = document.querySelectorAll('.currency-select')[9] ? document.querySelectorAll('.currency-select')[9].value : 'EUR';
             
             let additionalCostsEUR = additionalCosts;
             if (additionalCostsCurrency === 'USD') {
@@ -657,11 +674,12 @@
             
             transport.totalUSD = totalUSD;
             transport.totalEUR = totalUSD / exchangeRate;
+            transport.sellingPriceEUR = parseFloat(document.getElementById('selling-price').textContent.replace(' EUR', '').replace(',', '.'));
 
             if (editingIndex >= 0) {
                 savedTransports[editingIndex] = transport;
                 editingIndex = -1;
-                document.querySelector('.save-button').textContent = '💾 Transport speichern';
+                document.querySelector('.save-button').textContent = 'Transport speichern';
             } else {
                 savedTransports.push(transport);
             }
@@ -692,11 +710,11 @@
                     <div class="transport-item">
                         <button class="delete-button" onclick="deleteTransport(${index})">❌</button>
                         <button class="edit-button" onclick="editTransport(${index})">✏️</button>
-                        <h4>${transport.name}</h4>
+                        <h4>${transport.name} (${transport.group || 'Sonstiges'})</h4>
                         <small>Gespeichert: ${transport.timestamp}</small><br>
                         <small><strong>Route:</strong> ${transport.origin} → ${transport.destination}</small>
                         <div class="transport-total">
-                            <strong>Gesamt: ${transport.totalUSD.toFixed(2)} USD (${transport.totalEUR.toFixed(2)} EUR)</strong>
+                            <strong>Verkauf: ${(transport.sellingPriceEUR || transport.totalEUR).toFixed(2)} EUR</strong>
                         </div>
                     </div>
                 `;
@@ -842,7 +860,7 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
                     </style>
                 </head>
                 <body>
-                    <button class="copy-button" onclick="copyText()">📋 Text für Outlook kopieren</button>
+                    <button class="copy-button" onclick="copyText()">Text für Outlook kopieren</button>
                     <div class="offer-text" id="offerText">${offerText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>
                     
                     <script>
@@ -864,7 +882,7 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
                             document.body.removeChild(tempDiv);
                             alert('Angebot wurde für Outlook kopiert!');
                         }
-                    </script>
+                    <\/script>
                 </body>
                 </html>
             `);
@@ -897,31 +915,6 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
 
 Mit freundlichen Grüßen`;
 
-            document.getElementById('offer-preview').textContent = offerText;
-        }
-
-        function updateMultiOfferPreview() {
-            const customerName = document.getElementById('customer-name').value || 'Andreas';
-            let offerText = `Hallo ${customerName},
-
-wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläge, Tarife, bei freier Airline- und Routenwahl, ADSP freibleibend wie folgt offerieren:
-
-`;
-
-            savedTransports.forEach((transport, index) => {
-                const pickupDate = formatGermanDate(transport.pickupDate);
-                const deliveryDate = formatGermanDate(transport.deliveryDate);
-                
-                offerText += `**${index + 1}. ${transport.name}**
-**Sendung:** ${transport.shipmentDetails}
-
-Ab Werk ${transport.origin} bis DAP ${transport.destination} = ${transport.totalEUR.toFixed(0)} EUR
-Abholung: ${pickupDate} 11:00 geplante Zustellung: ${deliveryDate} in ${transport.destination}
-
-`;
-            });
-
-            offerText += "\nMit freundlichen Grüßen";
             document.getElementById('offer-preview').textContent = offerText;
         }
 
@@ -971,6 +964,8 @@ Abholung: ${pickupDate} 11:00 geplante Zustellung: ${deliveryDate} in ${transpor
             
             // Daten in Formular laden
             document.getElementById('transport-name').value = transport.name;
+            document.getElementById('transport-group').value = transport.group || 'Sonstiges';
+            document.getElementById('transport-priority').value = transport.priority || 1;
             document.getElementById('exchange-rate').value = transport.exchangeRate;
             document.getElementById('shipment-details').value = transport.shipmentDetails || '';
             document.getElementById('origin').value = transport.origin || '';
@@ -979,21 +974,33 @@ Abholung: ${pickupDate} 11:00 geplante Zustellung: ${deliveryDate} in ${transpor
             document.getElementById('delivery-date').value = transport.deliveryDate || '';
             
             // Vorlaufkosten laden
-            Object.keys(transport.vorlaufkosten).forEach((key, i) => {
-                const cost = transport.vorlaufkosten[key];
-                document.getElementById(key).value = cost.value;
-                document.querySelectorAll('.currency-select')[i].value = cost.currency;
-            });
+            if (transport.vorlaufkosten) {
+                Object.keys(transport.vorlaufkosten).forEach((key, i) => {
+                    const cost = transport.vorlaufkosten[key];
+                    if (document.getElementById(key)) {
+                        document.getElementById(key).value = cost.value || 0;
+                        if (document.querySelectorAll('.currency-select')[i]) {
+                            document.querySelectorAll('.currency-select')[i].value = cost.currency || 'EUR';
+                        }
+                    }
+                });
+            }
             
             // Nachlaufkosten laden
-            Object.keys(transport.nachlaufkosten).forEach((key, i) => {
-                const cost = transport.nachlaufkosten[key];
-                document.getElementById(key).value = cost.value;
-                document.querySelectorAll('.currency-select')[i + 4].value = cost.currency;
-            });
+            if (transport.nachlaufkosten) {
+                Object.keys(transport.nachlaufkosten).forEach((key, i) => {
+                    const cost = transport.nachlaufkosten[key];
+                    if (document.getElementById(key)) {
+                        document.getElementById(key).value = cost.value || 0;
+                        if (document.querySelectorAll('.currency-select')[i + 4]) {
+                            document.querySelectorAll('.currency-select')[i + 4].value = cost.currency || 'USD';
+                        }
+                    }
+                });
+            }
             
             editingIndex = index;
-            document.querySelector('.save-button').textContent = '✏️ Änderungen speichern';
+            document.querySelector('.save-button').textContent = 'Änderungen speichern';
             calculateTotals();
             
             // Scroll zum Formular
@@ -1021,18 +1028,22 @@ Abholung: ${pickupDate} 11:00 geplante Zustellung: ${deliveryDate} in ${transpor
             const inputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="date"], textarea');
             inputs.forEach(input => input.value = '');
             document.getElementById('exchange-rate').value = '1.18';
+            document.getElementById('transport-priority').value = '1';
+            document.getElementById('profit-margin').value = '15';
             
             // Currency selects zurücksetzen
             document.querySelectorAll('.currency-select').forEach((select, index) => {
                 if (index <= 3) {
                     select.value = 'EUR'; // Vorlaufkosten standardmäßig EUR
-                } else {
+                } else if (index <= 8) {
                     select.value = 'USD'; // Nachlaufkosten standardmäßig USD
+                } else {
+                    select.value = 'EUR'; // Zusätzliche Kosten standardmäßig EUR
                 }
             });
             
             editingIndex = -1;
-            document.querySelector('.save-button').textContent = '💾 Transport speichern';
+            document.querySelector('.save-button').textContent = 'Transport speichern';
             calculateTotals();
         }
 
@@ -1047,12 +1058,12 @@ Abholung: ${pickupDate} 11:00 geplante Zustellung: ${deliveryDate} in ${transpor
             
             savedTransports.forEach((transport, index) => {
                 csvContent += `Transport ${index + 1}: ${transport.name}\n`;
+                csvContent += `Gruppe:,${transport.group}\n`;
                 csvContent += `Route:,${transport.origin} → ${transport.destination}\n`;
                 csvContent += `Wechselkurs EUR-USD:,${transport.exchangeRate}\n`;
-                csvContent += `Datum:,${transport.timestamp}\n\n`;
-                
-                csvContent += `Gesamtkosten,${transport.totalUSD.toFixed(2)},USD\n`;
-                csvContent += `Gesamtkosten,${transport.totalEUR.toFixed(2)},EUR\n\n`;
+                csvContent += `Datum:,${transport.timestamp}\n`;
+                csvContent += `Einkaufspreis:,${transport.totalEUR.toFixed(2)},EUR\n`;
+                csvContent += `Verkaufspreis:,${(transport.sellingPriceEUR || transport.totalEUR).toFixed(2)},EUR\n\n`;
                 csvContent += "-------------------\n\n";
                 
                 grandTotalUSD += transport.totalUSD;
