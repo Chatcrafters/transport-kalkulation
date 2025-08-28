@@ -552,8 +552,14 @@
             document.getElementById('transport-name').value = transport.name;
             document.getElementById('exchange-rate').value = transport.exchangeRate;
             
-            Object.keys(transport.costs).forEach((key, i) => {
-                const cost = transport.costs[key];
+            // Vorlaufkosten laden (nur EUR)
+            Object.keys(transport.vorlaufkosten).forEach(key => {
+                document.getElementById(key).value = transport.vorlaufkosten[key];
+            });
+            
+            // Nachlaufkosten laden (mit Währung)
+            Object.keys(transport.nachlaufkosten).forEach((key, i) => {
+                const cost = transport.nachlaufkosten[key];
                 document.getElementById(key).value = cost.value;
                 document.querySelectorAll('.currency-select')[i].value = cost.currency;
             });
@@ -589,13 +595,9 @@
             document.getElementById('transport-name').value = '';
             document.getElementById('exchange-rate').value = '1.18';
             
-            // Currency selects zurücksetzen
-            document.querySelectorAll('.currency-select').forEach((select, index) => {
-                if (index <= 3) {
-                    select.value = 'EUR'; // Vorlaufkosten standardmäßig EUR
-                } else {
-                    select.value = 'USD'; // Nachlaufkosten standardmäßig USD
-                }
+            // Nur Nachlauf-Currency selects zurücksetzen (Vorlauf ist fest EUR)
+            document.querySelectorAll('.currency-select').forEach(select => {
+                select.value = 'USD'; // Nachlaufkosten standardmäßig USD
             });
             
             editingIndex = -1;
@@ -618,15 +620,15 @@
                 csvContent += `Datum:,${transport.timestamp}\n\n`;
                 
                 csvContent += "Vorlaufkosten\n";
-                Object.keys(transport.costs).slice(0, 4).forEach(key => {
-                    const cost = transport.costs[key];
+                Object.keys(transport.vorlaufkosten).forEach(key => {
+                    const cost = transport.vorlaufkosten[key];
                     const labels = { vorlauf: 'Vorlauf', handling1: 'Handling', xray: 'X-Ray', luftfracht: 'Luftfracht' };
-                    csvContent += `${labels[key]},${cost.value},${cost.currency}\n`;
+                    csvContent += `${labels[key]},${cost},EUR\n`;
                 });
                 
                 csvContent += "\nNachlaufkosten\n";
-                Object.keys(transport.costs).slice(4).forEach(key => {
-                    const cost = transport.costs[key];
+                Object.keys(transport.nachlaufkosten).forEach(key => {
+                    const cost = transport.nachlaufkosten[key];
                     const labels = { verzollung: 'Verzollung', isf: 'ISF', trucking: 'Trucking', handling2: 'Handling', supervising: 'Supervising' };
                     csvContent += `${labels[key]},${cost.value},${cost.currency}\n`;
                 });
