@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transportkostenkalkulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c5f2d;
+            text-align: center;
+            border-bottom: 3px solid #2c5f2d;
+            padding-bottom: 10px;
+        }
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+        .calculator-section {
+            flex: 1;
+            min-width: 500px;
+        }
+        .overview-section {
+            flex: 1;
+            min-width: 400px;
+        }
+        .transport-info {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .transport-info input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .cost-section {
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .section-header {
+            background-color: #2c5f2d;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            background-color: #fafafa;
+        }
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+        .cost-item label {
+            flex: 1;
+            font-weight: 500;
+        }
+        .cost-item input {
+            width: 120px;
+            padding: 6px 10px;
+            text-align: right;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .currency-select {
+            width: 70px;
+            margin-left: 5px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .subtotal {
+            background-color: #e8f5e8;
+            font-weight: bold;
+            color: #2c5f2d;
+        }
+        .total {
+            background-color: #2c5f2d;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .exchange-rate {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .exchange-rate input {
+            width: 100px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #2c5f2d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+        button:hover {
+            background-color: #1e4220;
+        }
+        .save-button {
+            background-color: #007bff;
+        }
+        .save-button:hover {
+            background-color: #0056b3;
+        }
+        .overview-header {
+            background-color: #6c757d;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .transport-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .transport-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #f8f9fa;
+        }
+        .transport-item:last-child {
+            border-bottom: none;
+        }
+        .transport-item h4 {
+            margin: 0 0 10px 0;
+            color: #2c5f2d;
+        }
+        .transport-costs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .transport-total {
+            font-weight: bold;
+            color: #dc3545;
+            margin-top: 10px;
+            text-align: right;
+        }
+        .grand-total {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+            float: right;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+        .edit-button {
+            background-color: #ffc107;
+            color: #000;
+            padding: 5px 10px;
+            font-size: 12px;
+            float: right;
+            margin-right: 5px;
+        }
+        .edit-button:hover {
+            background-color: #e0a800;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .calculator-section, .overview-section {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚛 Transportkostenkalkulation</h1>
+        
+        <div class="main-content">
+            <!-- Kalkulationsbereich -->
+            <div class="calculator-section">
+                <div class="transport-info">
+                    <label for="transport-name"><strong>Transportname/Bezeichnung:</strong></label>
+                    <input type="text" id="transport-name" placeholder="z.B. 5 Fahrzeuge mit 13205 Kg" value="5 Fahrzeuge mit 13205 Kg">
+                </div>
+
+                <!-- Wechselkurs EUR -> USD -->
+                <div class="exchange-rate">
+                    <strong>Wechselkurs EUR → USD:</strong>
+                    <input type="number" step="0.0001" id="exchange-rate" value="1.18" oninput="calculateTotals()">
+                    <span>USD/EUR</span>
+                </div>
+
+                <!-- Vorlaufkosten -->
+                <div class="cost-section">
+                    <div class="section-header">📦 Vorlaufkosten (nur EUR)</div>
+                    
+                    <div class="cost-item">
+                        <label>Vorlauf</label>
+                        <input type="number" step="0.01" id="vorlauf" oninput="calculateTotals()">
+                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">EUR</span>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Handling</label>
+                        <input type="number" step="0.01" id="handling1" oninput="calculateTotals()">
+                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">EUR</span>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>X-Ray</label>
+                        <input type="number" step="0.01" id="xray" oninput="calculateTotals()">
+                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">EUR</span>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Luftfracht</label>
+                        <input type="number" step="0.01" id="luftfracht" oninput="calculateTotals()">
+                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">EUR</span>
+                    </div>
+                    
+                    <div class="cost-item subtotal">
+                        <label>Zwischensumme Vorlaufkosten</label>
+                        <span id="subtotal-vorlauf">0,00 EUR</span>
+                    </div>
+                </div>
+
+                <!-- Nachlaufkosten -->
+                <div class="cost-section">
+                    <div class="section-header">🏭 Nachlaufkosten</div>
+                    
+                    <div class="cost-item">
+                        <label>Verzollung</label>
+                        <input type="number" step="0.01" id="verzollung" oninput="calculateTotals()">
+                        <select class="currency-select">
+                            <option selected>USD</option>
+                            <option>EUR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>ISF</label>
+                        <input type="number" step="0.01" id="isf" oninput="calculateTotals()">
+                        <select class="currency-select">
+                            <option selected>USD</option>
+                            <option>EUR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Trucking</label>
+                        <input type="number" step="0.01" id="trucking" oninput="calculateTotals()">
+                        <select class="currency-select">
+                            <option selected>USD</option>
+                            <option>EUR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Handling</label>
+                        <input type="number" step="0.01" id="handling2" oninput="calculateTotals()">
+                        <select class="currency-select">
+                            <option selected>USD</option>
+                            <option>EUR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="cost-item">
+                        <label>Supervising</label>
+                        <input type="number" step="0.01" id="supervising" oninput="calculateTotals()">
+                        <select class="currency-select">
+                            <option selected>USD</option>
+                            <option>EUR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="cost-item subtotal">
+                        <label>Zwischensumme Nachlaufkosten</label>
+                        <span id="subtotal-nachlauf">0,00 USD</span>
+                    </div>
+                </div>
+
+                <!-- Endsumme -->
+                <div class="cost-section">
+                    <div class="cost-item total">
+                        <label>🎯 ENDSUMME (USD)</label>
+                        <span id="total-final">0,00 USD</span>
+                    </div>
+                    <div class="cost-item total" style="background-color: #17a2b8;">
+                        <label>🎯 ENDSUMME (EUR)</label>
+                        <span id="total-final-eur">0,00 EUR</span>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="save-button" onclick="saveTransport()">💾 Transport speichern</button>
+                    <button onclick="resetForm()">🔄 Zurücksetzen</button>
+                    <button onclick="exportAllToCSV()">📊 Alle als CSV</button>
+                </div>
+            </div>
+
+            <!-- Übersichtsbereich -->
+            <div class="overview-section">
+                <div class="overview-header">
+                    <h2>📊 Gespeicherte Transporte</h2>
+                </div>
+                
+                <div class="transport-list" id="transport-list">
+                    <div style="padding: 20px; text-align: center; color: #666;">
+                        Noch keine Transporte gespeichert
+                    </div>
+                </div>
+
+                <div class="grand-total" id="grand-total" style="display: none;">
+                    🏆 GESAMTKOSTEN ALLER TRANSPORTE<br>
+                    <span id="grand-total-amount">0,00 USD</span><br>
+                    <small id="grand-total-eur">(0,00 EUR)</small>
+                </div>
+
+                <div class="buttons" style="margin-top: 20px;">
+                    <button onclick="clearAllTransports()" style="background-color: #dc3545;">🗑️ Alle löschen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let savedTransports = JSON.parse(localStorage.getItem('savedTransports')) || [];
+        let editingIndex = -1;
+
+        function calculateTotals() {
+            const exchangeRate = parseFloat(document.getElementById('exchange-rate').value) || 1.18;
+            
+            // Vorlaufkosten sammeln (immer in EUR)
+            const vorlaufKosten = {
+                vorlauf: parseFloat(document.getElementById('vorlauf').value) || 0,
+                handling1: parseFloat(document.getElementById('handling1').value) || 0,
+                xray: parseFloat(document.getElementById('xray').value) || 0,
+                luftfracht: parseFloat(document.getElementById('luftfracht').value) || 0
+            };
+
+            // Nachlaufkosten sammeln (mit Währungsauswahl)
+            const nachlaufKosten = {
+                verzollung: { value: parseFloat(document.getElementById('verzollung').value) || 0, currency: document.querySelectorAll('.currency-select')[0].value },
+                isf: { value: parseFloat(document.getElementById('isf').value) || 0, currency: document.querySelectorAll('.currency-select')[1].value },
+                trucking: { value: parseFloat(document.getElementById('trucking').value) || 0, currency: document.querySelectorAll('.currency-select')[2].value },
+                handling2: { value: parseFloat(document.getElementById('handling2').value) || 0, currency: document.querySelectorAll('.currency-select')[3].value },
+                supervising: { value: parseFloat(document.getElementById('supervising').value) || 0, currency: document.querySelectorAll('.currency-select')[4].value }
+            };
+
+            // Vorlaufkosten summieren (in EUR)
+            const subtotalVorlaufEUR = Object.values(vorlaufKosten).reduce((sum, cost) => sum + cost, 0);
+
+            // Nachlaufkosten in USD umrechnen
+            let subtotalNachlaufUSD = 0;
+            Object.values(nachlaufKosten).forEach(cost => {
+                if (cost.currency === 'EUR') {
+                    subtotalNachlaufUSD += cost.value * exchangeRate;
+                } else {
+                    subtotalNachlaufUSD += cost.value;
+                }
+            });
+
+            // Vorlaufkosten in USD umrechnen für Gesamtsumme
+            const subtotalVorlaufUSD = subtotalVorlaufEUR * exchangeRate;
+
+            // Anzeige aktualisieren
+            document.getElementById('subtotal-vorlauf').textContent = subtotalVorlaufEUR.toFixed(2) + ' EUR';
+            document.getElementById('subtotal-nachlauf').textContent = subtotalNachlaufUSD.toFixed(2) + ' USD';
+            
+            const totalUSD = subtotalVorlaufUSD + subtotalNachlaufUSD;
+            const totalEUR = totalUSD / exchangeRate;
+            
+            document.getElementById('total-final').textContent = totalUSD.toFixed(2) + ' USD';
+            document.getElementById('total-final-eur').textContent = totalEUR.toFixed(2) + ' EUR';
+        }
+
+        function saveTransport() {
+            const transportName = document.getElementById('transport-name').value || `Transport ${savedTransports.length + 1}`;
+            const exchangeRate = parseFloat(document.getElementById('exchange-rate').value) || 1.18;
+            
+            const transport = {
+                name: transportName,
+                exchangeRate: exchangeRate,
+                vorlaufkosten: {
+                    vorlauf: parseFloat(document.getElementById('vorlauf').value) || 0,
+                    handling1: parseFloat(document.getElementById('handling1').value) || 0,
+                    xray: parseFloat(document.getElementById('xray').value) || 0,
+                    luftfracht: parseFloat(document.getElementById('luftfracht').value) || 0
+                },
+                nachlaufkosten: {
+                    verzollung: { value: parseFloat(document.getElementById('verzollung').value) || 0, currency: document.querySelectorAll('.currency-select')[0].value },
+                    isf: { value: parseFloat(document.getElementById('isf').value) || 0, currency: document.querySelectorAll('.currency-select')[1].value },
+                    trucking: { value: parseFloat(document.getElementById('trucking').value) || 0, currency: document.querySelectorAll('.currency-select')[2].value },
+                    handling2: { value: parseFloat(document.getElementById('handling2').value) || 0, currency: document.querySelectorAll('.currency-select')[3].value },
+                    supervising: { value: parseFloat(document.getElementById('supervising').value) || 0, currency: document.querySelectorAll('.currency-select')[4].value }
+                },
+                timestamp: new Date().toLocaleString('de-DE')
+            };
+
+            // Berechne Gesamtkosten
+            const vorlaufSummeEUR = Object.values(transport.vorlaufkosten).reduce((sum, cost) => sum + cost, 0);
+            let nachlaufSummeUSD = 0;
+            
+            Object.values(transport.nachlaufkosten).forEach(cost => {
+                if (cost.currency === 'EUR') {
+                    nachlaufSummeUSD += cost.value * exchangeRate;
+                } else {
+                    nachlaufSummeUSD += cost.value;
+                }
+            });
+
+            transport.vorlaufSummeEUR = vorlaufSummeEUR;
+            transport.nachlaufSummeUSD = nachlaufSummeUSD;
+            transport.totalUSD = (vorlaufSummeEUR * exchangeRate) + nachlaufSummeUSD;
+            transport.totalEUR = transport.totalUSD / exchangeRate;
+
+            if (editingIndex >= 0) {
+                savedTransports[editingIndex] = transport;
+                editingIndex = -1;
+                document.querySelector('.save-button').textContent = '💾 Transport speichern';
+            } else {
+                savedTransports.push(transport);
+            }
+
+            localStorage.setItem('savedTransports', JSON.stringify(savedTransports));
+            displayTransports();
+            resetForm();
+            
+            alert(`Transport "${transportName}" wurde gespeichert!`);
+        }
+
+        function displayTransports() {
+            const listContainer = document.getElementById('transport-list');
+            
+            if (savedTransports.length === 0) {
+                listContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Noch keine Transporte gespeichert</div>';
+                document.getElementById('grand-total').style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            let grandTotalUSD = 0;
+
+            savedTransports.forEach((transport, index) => {
+                grandTotalUSD += transport.totalUSD;
+                
+                html += `
+                    <div class="transport-item">
+                        <button class="delete-button" onclick="deleteTransport(${index})">❌</button>
+                        <button class="edit-button" onclick="editTransport(${index})">✏️</button>
+                        <h4>${transport.name}</h4>
+                        <small>Gespeichert: ${transport.timestamp} | Kurs: ${transport.exchangeRate}</small>
+                        <div class="transport-costs">
+                            <div><strong>Vorlaufkosten (EUR):</strong></div>
+                            <div></div>
+                `;
+                
+                // Vorlaufkosten anzeigen
+                Object.keys(transport.vorlaufkosten).forEach(key => {
+                    const cost = transport.vorlaufkosten[key];
+                    if (cost > 0) {
+                        const labels = { vorlauf: 'Vorlauf', handling1: 'Handling', xray: 'X-Ray', luftfracht: 'Luftfracht' };
+                        html += `<div>• ${labels[key]}:</div><div>${cost.toFixed(2)} EUR</div>`;
+                    }
+                });
+                
+                html += `
+                            <div><strong>Nachlaufkosten:</strong></div>
+                            <div></div>
+                `;
+                
+                // Nachlaufkosten anzeigen
+                Object.keys(transport.nachlaufkosten).forEach(key => {
+                    const cost = transport.nachlaufkosten[key];
+                    if (cost.value > 0) {
+                        const labels = { verzollung: 'Verzollung', isf: 'ISF', trucking: 'Trucking', handling2: 'Handling', supervising: 'Supervising' };
+                        html += `<div>• ${labels[key]}:</div><div>${cost.value.toFixed(2)} ${cost.currency}</div>`;
+                    }
+                });
+                
+                html += `
+                        </div>
+                        <div class="transport-total">
+                            Vorlauf: ${transport.vorlaufSummeEUR.toFixed(2)} EUR | Nachlauf: ${transport.nachlaufSummeUSD.toFixed(2)} USD<br>
+                            <strong>Gesamt: ${transport.totalUSD.toFixed(2)} USD (${transport.totalEUR.toFixed(2)} EUR)</strong>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+            
+            // Gesamtsumme anzeigen
+            const grandTotalEUR = grandTotalUSD / (savedTransports[0]?.exchangeRate || 1.18);
+            document.getElementById('grand-total-amount').textContent = `${grandTotalUSD.toFixed(2)} USD`;
+            document.getElementById('grand-total-eur').textContent = `(${grandTotalEUR.toFixed(2)} EUR)`;
+            document.getElementById('grand-total').style.display = 'block';
+        }
+
+        function editTransport(index) {
+            const transport = savedTransports[index];
+            
+            // Daten in Formular laden
+            document.getElementById('transport-name').value = transport.name;
+            document.getElementById('exchange-rate').value = transport.exchangeRate;
+            
+            Object.keys(transport.costs).forEach((key, i) => {
+                const cost = transport.costs[key];
+                document.getElementById(key).value = cost.value;
+                document.querySelectorAll('.currency-select')[i].value = cost.currency;
+            });
+            
+            editingIndex = index;
+            document.querySelector('.save-button').textContent = '✏️ Änderungen speichern';
+            calculateTotals();
+            
+            // Scroll zum Formular
+            document.querySelector('.calculator-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteTransport(index) {
+            const transportName = savedTransports[index].name;
+            if (confirm(`Transport "${transportName}" wirklich löschen?`)) {
+                savedTransports.splice(index, 1);
+                localStorage.setItem('savedTransports', JSON.stringify(savedTransports));
+                displayTransports();
+            }
+        }
+
+        function clearAllTransports() {
+            if (confirm('Wirklich alle Transporte löschen?')) {
+                savedTransports = [];
+                localStorage.removeItem('savedTransports');
+                displayTransports();
+            }
+        }
+
+        function resetForm() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => input.value = '');
+            document.getElementById('transport-name').value = '';
+            document.getElementById('exchange-rate').value = '1.18';
+            
+            // Currency selects zurücksetzen
+            document.querySelectorAll('.currency-select').forEach((select, index) => {
+                if (index <= 3) {
+                    select.value = 'EUR'; // Vorlaufkosten standardmäßig EUR
+                } else {
+                    select.value = 'USD'; // Nachlaufkosten standardmäßig USD
+                }
+            });
+            
+            editingIndex = -1;
+            document.querySelector('.save-button').textContent = '💾 Transport speichern';
+            calculateTotals();
+        }
+
+        function exportAllToCSV() {
+            if (savedTransports.length === 0) {
+                alert('Keine Transporte zum Exportieren vorhanden!');
+                return;
+            }
+            
+            let csvContent = "Gesamte Transportkostenkalkulation\n\n";
+            let grandTotalUSD = 0;
+            
+            savedTransports.forEach((transport, index) => {
+                csvContent += `Transport ${index + 1}: ${transport.name}\n`;
+                csvContent += `Wechselkurs EUR-USD:,${transport.exchangeRate}\n`;
+                csvContent += `Datum:,${transport.timestamp}\n\n`;
+                
+                csvContent += "Vorlaufkosten\n";
+                Object.keys(transport.costs).slice(0, 4).forEach(key => {
+                    const cost = transport.costs[key];
+                    const labels = { vorlauf: 'Vorlauf', handling1: 'Handling', xray: 'X-Ray', luftfracht: 'Luftfracht' };
+                    csvContent += `${labels[key]},${cost.value},${cost.currency}\n`;
+                });
+                
+                csvContent += "\nNachlaufkosten\n";
+                Object.keys(transport.costs).slice(4).forEach(key => {
+                    const cost = transport.costs[key];
+                    const labels = { verzollung: 'Verzollung', isf: 'ISF', trucking: 'Trucking', handling2: 'Handling', supervising: 'Supervising' };
+                    csvContent += `${labels[key]},${cost.value},${cost.currency}\n`;
+                });
+                
+                csvContent += `\nGesamtkosten,${transport.totalUSD.toFixed(2)},USD\n`;
+                csvContent += `Gesamtkosten,${transport.totalEUR.toFixed(2)},EUR\n\n`;
+                csvContent += "-------------------\n\n";
+                
+                grandTotalUSD += transport.totalUSD;
+            });
+            
+            csvContent += `GESAMTKOSTEN ALLER TRANSPORTE,${grandTotalUSD.toFixed(2)},USD\n`;
+            csvContent += `GESAMTKOSTEN ALLER TRANSPORTE,${(grandTotalUSD / (savedTransports[0]?.exchangeRate || 1.18)).toFixed(2)},EUR`;
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "alle_transportkalkulationen.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initial laden der gespeicherten Transporte
+        window.onload = function() {
+            displayTransports();
+            calculateTotals();
+        };
+    </script>
+</body>
+</html>
