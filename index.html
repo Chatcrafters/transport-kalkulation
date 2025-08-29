@@ -59,6 +59,11 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
+        .route-info-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
         .cost-section {
             margin: 20px 0;
             border: 2px solid #ddd;
@@ -109,6 +114,12 @@
         }
         .total {
             background-color: #2c5f2d;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .selling-price {
+            background-color: #28a745;
             color: white;
             font-weight: bold;
             font-size: 18px;
@@ -237,12 +248,12 @@
         }
         .modal-content {
             background-color: white;
-            margin: 5% auto;
+            margin: 2% auto;
             padding: 20px;
             border-radius: 8px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 80vh;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
             overflow-y: auto;
         }
         .close {
@@ -259,11 +270,12 @@
             border: 1px solid #ddd;
             padding: 20px;
             background-color: #f9f9f9;
-            font-family: 'Courier New', monospace;
+            font-family: Arial, sans-serif;
             white-space: pre-line;
             margin: 20px 0;
             max-height: 400px;
             overflow-y: auto;
+            line-height: 1.6;
         }
         .offer-form {
             display: grid;
@@ -279,6 +291,31 @@
         .full-width {
             grid-column: 1 / -1;
         }
+        .offer-options {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        .offer-options h4 {
+            margin-top: 0;
+            color: #2c5f2d;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -286,7 +323,10 @@
             .calculator-section, .overview-section {
                 min-width: auto;
             }
-            .offer-form {
+            .offer-form, .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            .route-info-3 {
                 grid-template-columns: 1fr;
             }
         }
@@ -342,13 +382,31 @@
                             <label><strong>Nach:</strong></label>
                             <input type="text" id="destination" placeholder="z.B. Englewood (CO)">
                         </div>
+                    </div>
+                    
+                    <div class="route-info-3">
                         <div>
                             <label><strong>Abholung:</strong></label>
                             <input type="date" id="pickup-date">
                         </div>
                         <div>
+                            <label><strong>Abholzeit:</strong></label>
+                            <input type="time" id="pickup-time" value="11:00">
+                        </div>
+                        <div>
+                            <label><strong>Geplanter Flug:</strong></label>
+                            <input type="date" id="flight-date">
+                        </div>
+                    </div>
+                    
+                    <div class="route-info">
+                        <div>
                             <label><strong>Zustellung:</strong></label>
                             <input type="date" id="delivery-date">
+                        </div>
+                        <div>
+                            <label><strong>Zustellzeit (optional):</strong></label>
+                            <input type="time" id="delivery-time">
                         </div>
                     </div>
                 </div>
@@ -461,35 +519,21 @@
                     </div>
                 </div>
 
-                <!-- Einkaufs-/Verkaufspreis -->
+                <!-- EK/VK-Bereich -->
                 <div class="cost-section">
                     <div class="cost-item total">
-                        <label>Einkaufspreis (EUR)</label>
+                        <label>Einkaufspreis (EK)</label>
                         <span id="total-final-eur">0,00 EUR</span>
                     </div>
                     
-                    <div class="cost-item">
-                        <label>Gewinnmarge (%)</label>
-                        <input type="number" step="0.1" id="profit-margin" value="15" oninput="calculateTotals()" placeholder="15">
-                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">%</span>
-                    </div>
-                    
-                    <div class="cost-item">
-                        <label>Zusätzliche Kosten</label>
-                        <input type="number" step="0.01" id="additional-costs" oninput="calculateTotals()" placeholder="0">
-                        <select class="currency-select" onchange="calculateTotals()">
-                            <option>EUR</option>
-                            <option>USD</option>
-                        </select>
-                    </div>
-                    
-                    <div class="cost-item total" style="background-color: #28a745;">
-                        <label>Verkaufspreis (EUR)</label>
-                        <span id="selling-price">0,00 EUR</span>
+                    <div class="cost-item selling-price">
+                        <label>Verkaufspreis (VK)</label>
+                        <input type="number" step="0.01" id="selling-price-input" oninput="calculateProfit()" style="background: white; color: black;">
+                        <span style="padding: 6px 10px; background-color: #e9ecef; border: 1px solid #ddd; border-radius: 4px; width: 70px; text-align: center; margin-left: 5px;">EUR</span>
                     </div>
                     
                     <div class="cost-item subtotal">
-                        <label>Gewinn (EUR)</label>
+                        <label>Gewinn</label>
                         <span id="profit-amount">0,00 EUR</span>
                     </div>
                 </div>
@@ -540,9 +584,22 @@
                 <input type="text" id="offer-to" placeholder="Nach" value="">
                 <input type="text" id="offer-shipment" placeholder="Sendungsdetails" class="full-width" value="">
                 <input type="date" id="offer-pickup" placeholder="Abholung">
+                <input type="time" id="offer-pickup-time" value="11:00">
+                <input type="date" id="offer-flight" placeholder="Geplanter Flug">
                 <input type="date" id="offer-delivery" placeholder="Zustellung">
-                <input type="text" id="pickup-time" placeholder="Abholzeit (z.B. 11:00)" value="11:00">
-                <input type="text" id="delivery-time" placeholder="Zustellzeit" value="">
+                <input type="time" id="offer-delivery-time" placeholder="Zustellzeit (optional)">
+            </div>
+
+            <div class="offer-options">
+                <h4>Anzeige-Optionen</h4>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="show-flight-date" checked> Flugdatum anzeigen</label>
+                    <label><input type="checkbox" id="show-shipment-details" checked> Sendungsdetails anzeigen</label>
+                    <label><input type="checkbox" id="show-pickup-times" checked> Abholzeiten anzeigen</label>
+                    <label><input type="checkbox" id="show-delivery-times"> Zustellzeiten anzeigen</label>
+                    <label><input type="checkbox" id="show-group-totals" checked> Gesamtkosten pro Gruppe</label>
+                    <label><input type="checkbox" id="show-usd-prices"> USD-Preise zusätzlich anzeigen</label>
+                </div>
             </div>
             
             <div class="buttons">
@@ -604,25 +661,21 @@
             const totalUSD = subtotalVorlaufUSD + subtotalNachlaufUSD;
             const totalEUR = totalUSD / exchangeRate;
             
-            // Verkaufspreis berechnen
-            const profitMargin = parseFloat(document.getElementById('profit-margin').value) || 0;
-            const additionalCosts = parseFloat(document.getElementById('additional-costs').value) || 0;
-            const additionalCostsCurrency = document.querySelectorAll('.currency-select')[9] ? document.querySelectorAll('.currency-select')[9].value : 'EUR';
-            
-            let additionalCostsEUR = additionalCosts;
-            if (additionalCostsCurrency === 'USD') {
-                additionalCostsEUR = additionalCosts / exchangeRate;
-            }
-            
-            const sellingPriceEUR = totalEUR + (totalEUR * profitMargin / 100) + additionalCostsEUR;
-            const profitEUR = sellingPriceEUR - totalEUR - additionalCostsEUR;
-            
             // Anzeige aktualisieren
             document.getElementById('subtotal-vorlauf').textContent = subtotalVorlaufUSD.toFixed(2) + ' USD';
             document.getElementById('subtotal-nachlauf').textContent = subtotalNachlaufUSD.toFixed(2) + ' USD';
             document.getElementById('total-final-eur').textContent = totalEUR.toFixed(2) + ' EUR';
-            document.getElementById('selling-price').textContent = sellingPriceEUR.toFixed(2) + ' EUR';
-            document.getElementById('profit-amount').textContent = profitEUR.toFixed(2) + ' EUR';
+            
+            // Gewinn berechnen wenn VK eingegeben
+            calculateProfit();
+        }
+
+        function calculateProfit() {
+            const sellingPrice = parseFloat(document.getElementById('selling-price-input').value) || 0;
+            const buyingPrice = parseFloat(document.getElementById('total-final-eur').textContent.replace(' EUR', '').replace(',', '.')) || 0;
+            const profit = sellingPrice - buyingPrice;
+            
+            document.getElementById('profit-amount').textContent = profit.toFixed(2) + ' EUR';
         }
 
         function saveTransport() {
@@ -638,7 +691,10 @@
                 origin: document.getElementById('origin').value || '',
                 destination: document.getElementById('destination').value || '',
                 pickupDate: document.getElementById('pickup-date').value || '',
+                pickupTime: document.getElementById('pickup-time').value || '11:00',
+                flightDate: document.getElementById('flight-date').value || '',
                 deliveryDate: document.getElementById('delivery-date').value || '',
+                deliveryTime: document.getElementById('delivery-time').value || '',
                 vorlaufkosten: {
                     vorlauf: { value: parseFloat(document.getElementById('vorlauf').value) || 0, currency: document.querySelectorAll('.currency-select')[0].value },
                     handling1: { value: parseFloat(document.getElementById('handling1').value) || 0, currency: document.querySelectorAll('.currency-select')[1].value },
@@ -655,7 +711,7 @@
                 timestamp: new Date().toLocaleString('de-DE')
             };
 
-            // Berechne Gesamtkosten in USD
+            // Berechne Gesamtkosten in USD und EUR
             let totalUSD = 0;
             Object.values(transport.vorlaufkosten).forEach(cost => {
                 if (cost.currency === 'EUR') {
@@ -674,7 +730,8 @@
             
             transport.totalUSD = totalUSD;
             transport.totalEUR = totalUSD / exchangeRate;
-            transport.sellingPriceEUR = parseFloat(document.getElementById('selling-price').textContent.replace(' EUR', '').replace(',', '.'));
+            transport.sellingPriceEUR = parseFloat(document.getElementById('selling-price-input').value) || transport.totalEUR;
+            transport.profitEUR = transport.sellingPriceEUR - transport.totalEUR;
 
             if (editingIndex >= 0) {
                 savedTransports[editingIndex] = transport;
@@ -702,9 +759,11 @@
 
             let html = '';
             let grandTotalUSD = 0;
+            let grandTotalVKEUR = 0;
 
             savedTransports.forEach((transport, index) => {
                 grandTotalUSD += transport.totalUSD;
+                grandTotalVKEUR += transport.sellingPriceEUR || transport.totalEUR;
                 
                 html += `
                     <div class="transport-item">
@@ -714,7 +773,8 @@
                         <small>Gespeichert: ${transport.timestamp}</small><br>
                         <small><strong>Route:</strong> ${transport.origin} → ${transport.destination}</small>
                         <div class="transport-total">
-                            <strong>Verkauf: ${(transport.sellingPriceEUR || transport.totalEUR).toFixed(2)} EUR</strong>
+                            <strong>EK: ${transport.totalEUR.toFixed(2)} EUR | VK: ${(transport.sellingPriceEUR || transport.totalEUR).toFixed(2)} EUR</strong><br>
+                            <strong>Gewinn: ${((transport.sellingPriceEUR || transport.totalEUR) - transport.totalEUR).toFixed(2)} EUR</strong>
                         </div>
                     </div>
                 `;
@@ -724,8 +784,8 @@
             
             // Gesamtsumme anzeigen
             const grandTotalEUR = grandTotalUSD / (savedTransports[0]?.exchangeRate || 1.18);
-            document.getElementById('grand-total-amount').textContent = `${grandTotalUSD.toFixed(2)} USD`;
-            document.getElementById('grand-total-eur').textContent = `(${grandTotalEUR.toFixed(2)} EUR)`;
+            document.getElementById('grand-total-amount').textContent = `EK: ${grandTotalEUR.toFixed(2)} EUR | VK: ${grandTotalVKEUR.toFixed(2)} EUR`;
+            document.getElementById('grand-total-eur').textContent = `Gewinn: ${(grandTotalVKEUR - grandTotalEUR).toFixed(2)} EUR`;
             document.getElementById('grand-total').style.display = 'block';
         }
 
@@ -737,7 +797,10 @@
             document.getElementById('offer-to').value = document.getElementById('destination').value;
             document.getElementById('offer-shipment').value = document.getElementById('shipment-details').value;
             document.getElementById('offer-pickup').value = document.getElementById('pickup-date').value;
+            document.getElementById('offer-pickup-time').value = document.getElementById('pickup-time').value;
+            document.getElementById('offer-flight').value = document.getElementById('flight-date').value;
             document.getElementById('offer-delivery').value = document.getElementById('delivery-date').value;
+            document.getElementById('offer-delivery-time').value = document.getElementById('delivery-time').value;
             
             modal.style.display = 'block';
             updateOfferPreview();
@@ -751,14 +814,11 @@
             
             // Transporte nach Gruppe und Priorität sortieren
             const sortedTransports = [...savedTransports].sort((a, b) => {
-                // Erst nach Gruppe
                 const groupOrder = ['Hintransport', 'Innertransport', 'Rücktransport', 'Sonstiges'];
                 const groupA = groupOrder.indexOf(a.group) !== -1 ? groupOrder.indexOf(a.group) : 999;
                 const groupB = groupOrder.indexOf(b.group) !== -1 ? groupOrder.indexOf(b.group) : 999;
                 
                 if (groupA !== groupB) return groupA - groupB;
-                
-                // Dann nach Priorität
                 return (a.priority || 1) - (b.priority || 1);
             });
             
@@ -775,56 +835,68 @@
             const customerName = prompt('Kundenname:', 'Andreas') || 'Andreas';
             const exchangeRate = savedTransports[0]?.exchangeRate || 1.18;
             
-            let offerText = `Hallo ${customerName},
+            let offerText = `Sehr geehrter Herr ${customerName},
 
-wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläge, Tarife, Umrechnungskurs: USD/EUR ${exchangeRate} bei freier Airline- und Routenwahl, ADSP freibleibend wie folgt offerieren:
+aufgrund aktueller Marktgegebenheiten, Umrechnungskurs EUR/USD ${exchangeRate}, und bei freier Airline-/Routenwahl können wir Ihnen folgende Preise anbieten:
 
 `;
 
             let counter = 1;
+            const groupTotals = {};
+            
             Object.keys(groupedTransports).forEach(group => {
                 const transports = groupedTransports[group];
-                let groupTotal = 0;
+                let groupTotalEUR = 0;
+                let groupTotalUSD = 0;
                 
-                if (transports.length > 1) {
-                    // Gruppe mit Gesamtsumme
-                    offerText += `**${group.toUpperCase()}**\n\n`;
-                    
-                    transports.forEach((transport, index) => {
-                        const pickupDate = formatGermanDate(transport.pickupDate);
-                        const deliveryDate = formatGermanDate(transport.deliveryDate);
-                        
-                        offerText += `**${counter}. ${transport.name}**\n`;
-                        offerText += `**Sendung:** ${transport.shipmentDetails}\n\n`;
-                        offerText += `**Ab Werk ${transport.origin} bis DAP ${transport.destination} = ${Math.round(transport.sellingPriceEUR || transport.totalEUR).toLocaleString('de-DE')} EUR**\n\n`;
-                        offerText += `**Abholung:** ${pickupDate} 11:00\n`;
-                        offerText += `**Geplante Zustellung:** ${deliveryDate} in ${transport.destination}\n\n`;
-                        
-                        counter++;
-                        groupTotal += transport.sellingPriceEUR || transport.totalEUR;
-                    });
-                    
-                    offerText += `**GESAMTSUMME ${group.toUpperCase()}: ${Math.round(groupTotal).toLocaleString('de-DE')} EUR**\n\n`;
-                    offerText += '---\n\n';
-                } else {
-                    // Einzeltransport
-                    const transport = transports[0];
+                transports.forEach((transport) => {
                     const pickupDate = formatGermanDate(transport.pickupDate);
                     const deliveryDate = formatGermanDate(transport.deliveryDate);
+                    const pickupTime = transport.pickupTime || '11:00';
+                    const deliveryTimeText = transport.deliveryTime ? `, ${transport.deliveryTime} Uhr` : '';
+                    const flightText = transport.flightDate ? `\n   Geplanter Flug: ${formatGermanDate(transport.flightDate)}` : '';
                     
-                    offerText += `**${counter}. ${transport.name}**\n`;
-                    offerText += `**Sendung:** ${transport.shipmentDetails}\n\n`;
-                    offerText += `**Ab Werk ${transport.origin} bis DAP ${transport.destination} = ${Math.round(transport.sellingPriceEUR || transport.totalEUR).toLocaleString('de-DE')} EUR**\n\n`;
-                    offerText += `**Abholung:** ${pickupDate} 11:00\n`;
-                    offerText += `**Geplante Zustellung:** ${deliveryDate} in ${transport.destination}\n\n`;
+                    const sellingPriceEUR = transport.sellingPriceEUR || transport.totalEUR;
+                    const sellingPriceUSD = sellingPriceEUR * exchangeRate;
+                    
+                    let priceText = `EUR ${Math.round(sellingPriceEUR).toLocaleString('de-DE')}`;
+                    // USD zusätzlich anzeigen wenn ursprünglich USD kalkuliert wurde
+                    if (hasUSDCosts(transport)) {
+                        priceText += ` (USD ${Math.round(sellingPriceUSD).toLocaleString('de-DE')})`;
+                    }
+                    
+                    offerText += `${counter}. ${group.toUpperCase()}\n`;
+                    if (transport.shipmentDetails) {
+                        offerText += `   Sendung: ${transport.shipmentDetails}\n`;
+                    }
+                    offerText += `   Route: ${transport.origin} → ${transport.destination}\n`;
+                    offerText += `   Preis: ${priceText}\n`;
+                    offerText += `   Abholung: ${pickupDate}, ${pickupTime} Uhr${flightText}\n`;
+                    offerText += `   Zustellung: am ${deliveryDate}${deliveryTimeText}\n\n`;
                     
                     counter++;
-                }
+                    groupTotalEUR += sellingPriceEUR;
+                    groupTotalUSD += sellingPriceUSD;
+                });
+                
+                groupTotals[group] = { eur: groupTotalEUR, usd: groupTotalUSD };
             });
             
-            offerText += 'Mit freundlichen Grüßen';
+            // Gesamtpreise nach Gruppen
+            const groupNames = Object.keys(groupTotals);
+            if (groupNames.length > 1) {
+                const totalEUR = Object.values(groupTotals).reduce((sum, group) => sum + group.eur, 0);
+                const totalUSD = Object.values(groupTotals).reduce((sum, group) => sum + group.usd, 0);
+                
+                let priceText = `EUR ${Math.round(totalEUR).toLocaleString('de-DE')}`;
+                if (Object.values(savedTransports).some(t => hasUSDCosts(t))) {
+                    priceText += ` (USD ${Math.round(totalUSD).toLocaleString('de-DE')})`;
+                }
+                
+                offerText += `GESAMTPREIS ${groupNames.join(', ').toUpperCase()}: ${priceText}`;
+            }
             
-            // Nur Text anzeigen - kein Modal
+            // Neues Fenster mit nur Text
             const textWindow = window.open('', '_blank');
             textWindow.document.write(`
                 <html>
@@ -834,8 +906,7 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
                         body { 
                             font-family: Arial, sans-serif; 
                             margin: 40px; 
-                            line-height: 1.6;
-                            background: white;
+                            line-height: 1.8;
                         }
                         .offer-text { 
                             white-space: pre-line; 
@@ -861,15 +932,14 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
                 </head>
                 <body>
                     <button class="copy-button" onclick="copyText()">Text für Outlook kopieren</button>
-                    <div class="offer-text" id="offerText">${offerText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>
+                    <div class="offer-text" id="offerText">${offerText.replace(/\n/g, '<br>')}</div>
                     
                     <script>
                         function copyText() {
                             const text = \`${offerText}\`;
-                            const htmlText = text.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>').replace(/\\n/g, '<br>');
                             
                             const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = htmlText;
+                            tempDiv.innerHTML = text.replace(/\\n/g, '<br>');
                             document.body.appendChild(tempDiv);
                             
                             const range = document.createRange();
@@ -888,6 +958,11 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
             `);
         }
 
+        function hasUSDCosts(transport) {
+            const allCosts = {...transport.vorlaufkosten, ...transport.nachlaufkosten};
+            return Object.values(allCosts).some(cost => cost.currency === 'USD' && cost.value > 0);
+        }
+
         function updateOfferPreview() {
             const customerName = document.getElementById('customer-name').value || 'Andreas';
             const exchangeRate = document.getElementById('exchange-rate').value;
@@ -896,24 +971,51 @@ wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläg
             const origin = document.getElementById('offer-from').value || '';
             const destination = document.getElementById('offer-to').value || '';
             const pickupDate = formatGermanDate(document.getElementById('offer-pickup').value);
+            const pickupTime = document.getElementById('offer-pickup-time').value || '11:00';
+            const flightDate = formatGermanDate(document.getElementById('offer-flight').value);
             const deliveryDate = formatGermanDate(document.getElementById('offer-delivery').value);
-            const pickupTime = document.getElementById('pickup-time').value || '11:00';
-            const deliveryTime = document.getElementById('delivery-time').value || '';
-            const sellingPriceEUR = parseFloat(document.getElementById('selling-price').textContent.replace(' EUR', '').replace(',', '.'));
+            const deliveryTime = document.getElementById('offer-delivery-time').value;
+            
+            const sellingPriceEUR = parseFloat(document.getElementById('selling-price-input').value) || parseFloat(document.getElementById('total-final-eur').textContent.replace(' EUR', '').replace(',', '.'));
+            
+            // Checkboxen auslesen
+            const showFlightDate = document.getElementById('show-flight-date').checked;
+            const showShipmentDetails = document.getElementById('show-shipment-details').checked;
+            const showPickupTimes = document.getElementById('show-pickup-times').checked;
+            const showDeliveryTimes = document.getElementById('show-delivery-times').checked;
+            const showUSDPrices = document.getElementById('show-usd-prices').checked;
 
-            const offerText = `Hallo ${customerName},
+            let offerText = `Sehr geehrter Herr ${customerName},
 
-wir können Ihnen aufgrund heutiger Gegebenheiten, aktueller Raten und Zuschläge, Tarife, Umrechnungskurs: USD/EUR ${exchangeRate} bei freier Airline- und Routenwahl, ADSP freibleibend wie folgt offerieren:
+aufgrund aktueller Marktgegebenheiten, Umrechnungskurs EUR/USD ${exchangeRate}, und bei freier Airline-/Routenwahl können wir Ihnen folgende Preise anbieten:
 
-**${transportName}**
-**Sendung:** ${shipmentDetails}
+1. ${transportName.toUpperCase()}`;
 
-**Ab Werk ${origin} bis DAP ${destination} = ${Math.round(sellingPriceEUR).toLocaleString('de-DE')} EUR**
-
-**Abholung:** ${pickupDate} ${pickupTime}
-**Geplante Zustellung:** ${deliveryDate} in ${destination}
-
-Mit freundlichen Grüßen`;
+            if (showShipmentDetails && shipmentDetails) {
+                offerText += `\n   Sendung: ${shipmentDetails}`;
+            }
+            
+            offerText += `\n   Route: ${origin} → ${destination}`;
+            
+            let priceText = `EUR ${Math.round(sellingPriceEUR).toLocaleString('de-DE')}`;
+            if (showUSDPrices) {
+                const sellingPriceUSD = sellingPriceEUR * parseFloat(exchangeRate);
+                priceText += ` (USD ${Math.round(sellingPriceUSD).toLocaleString('de-DE')})`;
+            }
+            offerText += `\n   Preis: ${priceText}`;
+            
+            if (showPickupTimes && pickupDate) {
+                offerText += `\n   Abholung: ${pickupDate}, ${pickupTime} Uhr`;
+            }
+            
+            if (showFlightDate && flightDate) {
+                offerText += `\n   Geplanter Flug: ${flightDate}`;
+            }
+            
+            if (deliveryDate) {
+                const deliveryTimeText = (showDeliveryTimes && deliveryTime) ? `, ${deliveryTime} Uhr` : '';
+                offerText += `\n   Zustellung: am ${deliveryDate}${deliveryTimeText}`;
+            }
 
             document.getElementById('offer-preview').textContent = offerText;
         }
@@ -928,9 +1030,7 @@ Mit freundlichen Grüßen`;
             const offerText = document.getElementById('offer-preview').textContent;
             
             // Für Outlook formatieren (HTML)
-            const htmlText = offerText
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>');
+            const htmlText = offerText.replace(/\n/g, '<br>');
             
             // Erstelle ein temporäres Element für HTML-Kopie
             const tempDiv = document.createElement('div');
@@ -971,7 +1071,11 @@ Mit freundlichen Grüßen`;
             document.getElementById('origin').value = transport.origin || '';
             document.getElementById('destination').value = transport.destination || '';
             document.getElementById('pickup-date').value = transport.pickupDate || '';
+            document.getElementById('pickup-time').value = transport.pickupTime || '11:00';
+            document.getElementById('flight-date').value = transport.flightDate || '';
             document.getElementById('delivery-date').value = transport.deliveryDate || '';
+            document.getElementById('delivery-time').value = transport.deliveryTime || '';
+            document.getElementById('selling-price-input').value = transport.sellingPriceEUR || transport.totalEUR;
             
             // Vorlaufkosten laden
             if (transport.vorlaufkosten) {
@@ -1025,20 +1129,18 @@ Mit freundlichen Grüßen`;
         }
 
         function resetForm() {
-            const inputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="date"], textarea');
+            const inputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="date"], input[type="time"], textarea');
             inputs.forEach(input => input.value = '');
             document.getElementById('exchange-rate').value = '1.18';
             document.getElementById('transport-priority').value = '1';
-            document.getElementById('profit-margin').value = '15';
+            document.getElementById('pickup-time').value = '11:00';
             
             // Currency selects zurücksetzen
             document.querySelectorAll('.currency-select').forEach((select, index) => {
                 if (index <= 3) {
                     select.value = 'EUR'; // Vorlaufkosten standardmäßig EUR
-                } else if (index <= 8) {
-                    select.value = 'USD'; // Nachlaufkosten standardmäßig USD
                 } else {
-                    select.value = 'EUR'; // Zusätzliche Kosten standardmäßig EUR
+                    select.value = 'USD'; // Nachlaufkosten standardmäßig USD
                 }
             });
             
@@ -1054,7 +1156,8 @@ Mit freundlichen Grüßen`;
             }
             
             let csvContent = "Gesamte Transportkostenkalkulation\n\n";
-            let grandTotalUSD = 0;
+            let grandTotalEKEUR = 0;
+            let grandTotalVKEUR = 0;
             
             savedTransports.forEach((transport, index) => {
                 csvContent += `Transport ${index + 1}: ${transport.name}\n`;
@@ -1063,14 +1166,17 @@ Mit freundlichen Grüßen`;
                 csvContent += `Wechselkurs EUR-USD:,${transport.exchangeRate}\n`;
                 csvContent += `Datum:,${transport.timestamp}\n`;
                 csvContent += `Einkaufspreis:,${transport.totalEUR.toFixed(2)},EUR\n`;
-                csvContent += `Verkaufspreis:,${(transport.sellingPriceEUR || transport.totalEUR).toFixed(2)},EUR\n\n`;
+                csvContent += `Verkaufspreis:,${(transport.sellingPriceEUR || transport.totalEUR).toFixed(2)},EUR\n`;
+                csvContent += `Gewinn:,${((transport.sellingPriceEUR || transport.totalEUR) - transport.totalEUR).toFixed(2)},EUR\n\n`;
                 csvContent += "-------------------\n\n";
                 
-                grandTotalUSD += transport.totalUSD;
+                grandTotalEKEUR += transport.totalEUR;
+                grandTotalVKEUR += transport.sellingPriceEUR || transport.totalEUR;
             });
             
-            csvContent += `GESAMTKOSTEN ALLER TRANSPORTE,${grandTotalUSD.toFixed(2)},USD\n`;
-            csvContent += `GESAMTKOSTEN ALLER TRANSPORTE,${(grandTotalUSD / (savedTransports[0]?.exchangeRate || 1.18)).toFixed(2)},EUR`;
+            csvContent += `GESAMTEINKAUFSPREIS,${grandTotalEKEUR.toFixed(2)},EUR\n`;
+            csvContent += `GESAMTVERKAUFSPREIS,${grandTotalVKEUR.toFixed(2)},EUR\n`;
+            csvContent += `GESAMTGEWINN,${(grandTotalVKEUR - grandTotalEKEUR).toFixed(2)},EUR`;
             
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
